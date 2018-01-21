@@ -1,0 +1,14 @@
+module: KituraSessionKuery
+author: Marcin Krzyzanowski
+github_url: https://github.com/IBM-Swift/Kitura-Session-Kuery/
+
+theme: fullwidth
+clean: true
+exclude: [Packages]
+
+readme: README.md
+
+skip_undocumented: false
+hide_documentation_coverage: false
+
+xcodebuild_arguments: [-project, Kitura-Session-Kuery.xcodeproj, -target, KituraSessionKuery, LIBRARY_SEARCH_PATHS=.build/debug]
