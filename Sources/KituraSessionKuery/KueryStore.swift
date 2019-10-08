@@ -42,14 +42,17 @@ public class KueryStore: Store {
                 return
             }
 
-            if let row = result.asRows?.first {
-                if let base64String = row[self.sessions.data.name] as? String, let decodedData = Data(base64Encoded: base64String) {
-                    callback(decodedData, nil)
-                    return
+            result.asRows { rows, error in
+                if let row = rows?.first {
+                    if let base64String = row[self.sessions.data.name] as? String, let decodedData = Data(base64Encoded: base64String) {
+                        callback(decodedData, nil)
+                        return
+                    }
                 }
+                callback(nil, nil)
             }
 
-            callback(nil, nil)
+            // TODO: does this need to wait until completion?
         }
     }
 
