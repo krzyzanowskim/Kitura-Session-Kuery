@@ -28,7 +28,7 @@ public class KueryStore: Store {
     private func setupDB() {
         self.pool.getConnection() { connection, error in
             guard let connection = connection else {
-                print("Could not create connection to database in setup.  \(error?.localizedDescription)")
+                print("Could not create connection to database in setup.  \(error?.localizedDescription ?? "")")
                 return
             }
             self.sessions.create(connection: connection) { result in
@@ -44,7 +44,7 @@ public class KueryStore: Store {
         let query = Select(sessions.data, from: sessions).where(sessions.id == sessionId)
         self.pool.getConnection() { connection, error in
             guard let connection = connection else {
-                print("Could not create connection to database in all to load(sessionId: \(sessionId).  \(error?.localizedDescription)")
+                print("Could not create connection to database in all to load(sessionId: \(sessionId).  \(error?.localizedDescription ?? "")")
                 return
             }
             connection.execute(query: query) { result in
@@ -72,7 +72,7 @@ public class KueryStore: Store {
         let query = Insert(into: sessions, rows: [[sessionId, data.base64EncodedString()]])
         self.pool.getConnection() { connection, error in
             guard let connection = connection else {
-                print("Could not create connection to database in all to save(sessionId: \(sessionId).  \(error?.localizedDescription)")
+                print("Could not create connection to database in all to save(sessionId: \(sessionId).  \(error?.localizedDescription ?? "")")
                 return
             }
             connection.execute(query: query) { result in
@@ -94,7 +94,7 @@ public class KueryStore: Store {
         let query = Delete(from: sessions, where: sessions.id == sessionId)
         self.pool.getConnection() { connection, error in
             guard let connection = connection else {
-                print("Could not create connection to database in all to delete(sessionId: \(sessionId).  \(error?.localizedDescription)")
+                print("Could not create connection to database in all to delete(sessionId: \(sessionId).  \(error?.localizedDescription ?? "")")
                 return
             }
             connection.execute(query: query) { result in
