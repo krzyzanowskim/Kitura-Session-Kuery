@@ -69,20 +69,41 @@ public class KueryStore: Store {
     }
 
     public func save(sessionId: String, data: Data, callback: @escaping (NSError?) -> Void) {
-        let query = Insert(into: sessions, rows: [[sessionId, data.base64EncodedString()]])
+        let dataEncoded = data.base64EncodedString()
+        let updateQuery = Update(sessions,
+                                 set: [
+                                    (sessions.data, dataEncoded)
+                                    ], where: sessions.id == sessionId)
+        let insertQuery = Insert(into: sessions, rows: [[sessionId, dataEncoded]])
         self.pool.getConnection() { connection, error in
             guard let connection = connection else {
                 print("Could not create connection to database in all to save(sessionId: \(sessionId).  \(error?.localizedDescription ?? "")")
                 return
             }
-            connection.execute(query: query) { result in
-                guard result.success else {
-                    callback(result.asError as NSError?)
+            // nest update/insert until Kuery has an "upsert" command
+            connection.execute(query: updateQuery) { result in
+                switch result {
+                case .successNoData:
+                    connection.execute(query: insertQuery) { result in
+                        guard result.success else {
+                            callback(result.asError as NSError?)
+                            return
+                        }
+
+                        callback(nil)
+                    }
                     return
+                case .error(let error):
+                    callback(error as NSError)
+                case .success(_):
+                    callback(nil)
+                case .resultSet(_):
+                    callback(nil)
                 }
-    
+
                 callback(nil)
             }
+
         }
     }
 
